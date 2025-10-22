@@ -12,11 +12,11 @@ function App() {
 
   const getWeather = async () => {
     try {
-      const res = await axios.get(`http://localhost:3001/api/weather?city=${city}`);
+      const res = await axios.get(`https://weather-app-6bn3.onrender.com/api/weather?city=${city}`);
       setWeather(res.data);
       setError("");
 
-      const forecastRes = await axios.get(`http://localhost:3001/api/forecast?city=${city}`);
+      const forecastRes = await axios.get(`https://weather-app-6bn3.onrender.com/api/forecast?city=${city}`);
       const dailyForecast = processForecast(forecastRes.data);
       setForecast(dailyForecast);
 
