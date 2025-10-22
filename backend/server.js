@@ -7,7 +7,7 @@ dotenv.config();
 const app = express();
 app.use(cors());
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001; 
 const API_KEY = process.env.OPENWEATHER_KEY;
 
 // Route for weather data
