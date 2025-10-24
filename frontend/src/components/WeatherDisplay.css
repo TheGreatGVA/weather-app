@@ -44,3 +44,10 @@
   margin: 5px 0;
   font-size: 0.85rem;
 }
+
+.weather-container {
+  text-align: center;
+  background: rgba(255,255,255,0.15);
+  padding: 50px;
+  border-radius: 10px;
+}

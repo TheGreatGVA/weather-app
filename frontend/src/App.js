@@ -10,16 +10,17 @@ function App() {
   const [forecast, setForecast] = useState([]);
   const [error, setError] = useState("");
 
-  const getWeather = async () => {
+  const popularCities = ["London", "Hyderabad", "Tokyo", "Paris", "Delhi"];
+
+  const getWeather = async (cityName) => {
     try {
-      const res = await axios.get(`https://weather-app-6bn3.onrender.com/api/weather?city=${city}`);
+      const res = await axios.get(`http://localhost:3001/api/weather?city=${cityName}`);
       setWeather(res.data);
       setError("");
 
-      const forecastRes = await axios.get(`https://weather-app-6bn3.onrender.com/api/forecast?city=${city}`);
+      const forecastRes = await axios.get(`http://localhost:3001/api/forecast?city=${cityName}`);
       const dailyForecast = processForecast(forecastRes.data);
       setForecast(dailyForecast);
-
     } catch (err) {
       setWeather(null);
       setForecast([]);
@@ -27,13 +28,24 @@ function App() {
     }
   };
 
-  // Process forecast into daily min/max + icon
+  const handleSearch = (cityToSearch) => {
+    const finalCity = cityToSearch || city;
+    if (!finalCity) return;
+    setCity(finalCity); // update input field
+    getWeather(finalCity);
+  };
+
   const processForecast = (data) => {
     const daily = {};
-    data.list.forEach(item => {
-      const date = item.dt_txt.split(" ")[0]; // YYYY-MM-DD
+    data.list.forEach((item) => {
+      const date = item.dt_txt.split(" ")[0];
       if (!daily[date]) {
-        daily[date] = { min: item.main.temp, max: item.main.temp, icon: item.weather[0].icon, desc: item.weather[0].description };
+        daily[date] = {
+          min: item.main.temp,
+          max: item.main.temp,
+          icon: item.weather[0].icon,
+          desc: item.weather[0].description,
+        };
       } else {
         daily[date].min = Math.min(daily[date].min, item.main.temp);
         daily[date].max = Math.max(daily[date].max, item.main.temp);
@@ -43,25 +55,43 @@ function App() {
   };
 
   return (
-    <div className="App">
-      <header className="header">
-        <div id="time">{new Date().toLocaleTimeString()}</div>
-        <h1>Weather App</h1>
-      </header>
-
-      <div className="search">
+    <div className="app-container">
+      {/* LEFT COLUMN */}
+      <div className="sidebar">
+        <h2>Weather App</h2>
         <input
           type="text"
-          placeholder="Enter city name..."
+          placeholder="Enter city..."
           value={city}
           onChange={(e) => setCity(e.target.value)}
         />
-        <button onClick={getWeather}>Get Updates</button>
+        <button onClick={() => handleSearch()}>Search</button>
+
+        <div className="popular-cities">
+          <h3>Favorite Cities</h3>
+          {popularCities.map((c) => (
+            <button
+              key={c}
+              onClick={() => handleSearch(c)}
+              className="city-btn"
+            >
+              {c}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {weather && <WeatherDisplay data={weather} />}
-      {forecast.length > 0 && <ForecastDisplay forecast={forecast} />}
+      {/* RIGHT COLUMN */}
+      <div className="main-content">
+        {error && <p className="error">{error}</p>}
+        {weather && (
+          <>
+            <WeatherDisplay data={weather} />
+            {forecast.length > 0 && <ForecastDisplay forecast={forecast} />}
+          </>
+        )}
+        {!weather && <p>Search for a city to see weather updates.</p>}
+      </div>
     </div>
   );
 }
